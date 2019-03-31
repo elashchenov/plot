@@ -86,7 +86,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>main.Main</mainClass>
+                    <mainClass>main.Launcher</mainClass>
                 </configuration>
             </plugin>
         </plugins>

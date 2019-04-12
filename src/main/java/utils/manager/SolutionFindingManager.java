@@ -25,35 +25,18 @@ public class SolutionFindingManager {
                 Point p1 = points.get(i);
                 Point p2 = points.get(j);
                 double length; //длина прямой от двух точек р1 и р2 в эллипсе
-                Pair<Point, Point> segment; //крайние точки отрезка прямой в эллипсе
                 Pair<Point, Point> ellipseIntersect = computeEllipseIntersect(p1, p2);
                 if (ellipseIntersect == null) {
                     continue;
                 }
-                //В зависимости от расположения точек - в эллипсе или нет, меняется способ определения отрезка
-                //который лежит в эллипсе и на прямой от двух точек р1 и р2
-                if (!isInEllipse(p1) && !isInEllipse(p2)) {//Если обе точки не в эллипсе
-                    //Точки пересечения эллипса прямой могут не лежат на отрезке р1 и р2 - тогда пропускаем
-                    if (!isPointLiesOnSegment(p1, p2, ellipseIntersect.getKey())
-                            || !isPointLiesOnSegment(p1, p2, ellipseIntersect.getValue())) {
-                        continue;
-                    }
-                    segment = ellipseIntersect;
-                } else if (isInEllipse(p1) && isInEllipse(p2)) {//если обе точки в эллипсе
-                    segment = new Pair<>(p1, p2);
-                } else {//если одна из точек р1 или р2 не в эллипсе
-                    Point pointInEllipse = isInEllipse(p1) ? p1 : p2;
-                    //определяем какая из точек пересечения с эллипсом лежит на отрезке p1 и p2
-                    segment = isPointLiesOnSegment(p1, p2, ellipseIntersect.getKey())
-                            ? new Pair<>(ellipseIntersect.getKey(), pointInEllipse)
-                            : new Pair<>(pointInEllipse, ellipseIntersect.getValue());
-                }
-                length = segment.getKey().distance(segment.getValue());
-                System.out.println(p1 + " " + p2);
-                System.out.println(segment.getKey() + " " + segment.getValue() + "\nlength: " + length + "\n");
+                length = ellipseIntersect.getKey().distance(ellipseIntersect.getValue());
+                System.out.println("Points: " + p1 + " " + p2);
+                System.out.println("Intersection points: " +
+                        ellipseIntersect.getKey() + " "
+                        + ellipseIntersect.getValue() + "\nlength: " + length + "\n");
                 if (length > maxLength) {
                     solvePoints = new Pair<>(p1, p2);
-                    maxSegment = segment;
+                    maxSegment = ellipseIntersect;
                     maxLength = length;
                 }
             }
@@ -140,29 +123,5 @@ public class SolutionFindingManager {
         }
 
         return new Pair<>(x1, x2);
-    }
-
-    /**
-     * Определяет лежит ли точка в отрезке.
-     *
-     * @param a - первая точка отрезка
-     * @param b - вторая точка отрезка
-     * @param p - проверяемая точка
-     */
-    private static boolean isPointLiesOnSegment(Point a, Point b, Point p) {
-        //Определяем нижнюю и верхнюю точки отрезка
-        Point leftBottomPoint = (a.getX() <= b.getX()) && (a.getY() <= b.getY()) ? a : b;
-        Point rightTopPoint = leftBottomPoint == a ? b : a;
-
-        return (leftBottomPoint.getX() <= p.getX()) && (leftBottomPoint.getY() <= p.getY())
-                && (rightTopPoint.getX() >= p.getX()) && (rightTopPoint.getY() >= p.getY());
-    }
-
-    /**
-     * Определить лежит ли точка в эллипсе
-     */
-    private static boolean isInEllipse(Point point) {
-        return (Math.pow((point.getX() - ellipse.getCenterX()) / ellipse.getRadiusX(), 2)
-                + Math.pow((point.getY() - ellipse.getCenterY()) / ellipse.getRadiusY(), 2)) <= 1;
     }
 }
